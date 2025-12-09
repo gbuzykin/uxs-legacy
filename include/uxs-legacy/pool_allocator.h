@@ -1,7 +1,9 @@
 #pragma once
 
-#include "uxs/alignment.h"
-#include "uxs/dllist.h"
+#include <uxs/alignment.h>
+#include <uxs/dllist.h>
+
+#include "uxs-legacy/config.h"
 
 #include <cassert>
 #include <memory>
@@ -113,13 +115,13 @@ class pool {
     static void inc_use_count(void* node) { ++header(node)->use_count; }
     static std::size_t dec_use_count(void* node) { return --header(node)->use_count; }
 
-    UXS_EXPORT static void tidy(pool_desc_t* desc);
-    UXS_EXPORT static pool_desc_t* find_pool(pool_desc_t* desc, std::uint32_t size_and_alignment);
-    UXS_EXPORT static pool_desc_t* allocate_new_pool(alloc_type al);
-    UXS_EXPORT static pool_desc_t* allocate_dummy_pool(const alloc_type& al, std::uint32_t partition_size);
+    UXS_LEGACY_EXPORT static void tidy(pool_desc_t* desc);
+    UXS_LEGACY_EXPORT static pool_desc_t* find_pool(pool_desc_t* desc, std::uint32_t size_and_alignment);
+    UXS_LEGACY_EXPORT static pool_desc_t* allocate_new_pool(alloc_type al);
+    UXS_LEGACY_EXPORT static pool_desc_t* allocate_dummy_pool(const alloc_type& al, std::uint32_t partition_size);
 };
 
-extern UXS_EXPORT pool<std::allocator<void>> g_global_pool;
+extern UXS_LEGACY_EXPORT pool<std::allocator<void>> g_global_pool;
 
 template<typename Pool, std::uint16_t Size, std::uint16_t Alignment>
 struct pool_specializer {
