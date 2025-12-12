@@ -41,8 +41,8 @@ struct list_node_traits {
     static list_links_t* get_head(list_links_t* node) { return node->head; }
     static list_links_t* get_front(list_links_t* head) { return head->next; }
 #else   // UXS_ITERATOR_DEBUG_LEVEL != 0
-    static void set_head(list_links_t* node, list_links_t* head) {}
-    static void set_head(list_links_t* first, list_links_t* last, list_links_t* head) {}
+    static void set_head(list_links_t* /*node*/, list_links_t* /*head*/) {}
+    static void set_head(list_links_t* /*first*/, list_links_t* /*last*/, list_links_t* /*head*/) {}
 #endif  // UXS_ITERATOR_DEBUG_LEVEL != 0
     static Ty& get_value(list_links_t* node) { return static_cast<node_t*>(node)->value; }
 };

@@ -349,5 +349,5 @@ void swap(uxs::pool_allocator<Ty, Alloc>& a1, uxs::pool_allocator<Ty, Alloc>& a2
     a1.swap(a2);
 }
 template<typename Ty>
-void swap(uxs::global_pool_allocator<Ty>& a1, uxs::global_pool_allocator<Ty>& a2) noexcept {}
+void swap(uxs::global_pool_allocator<Ty>& /*a1*/, uxs::global_pool_allocator<Ty>& /*a2*/) noexcept {}
 }  // namespace std

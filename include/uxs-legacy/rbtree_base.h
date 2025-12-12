@@ -40,8 +40,8 @@ struct rbtree_node_traits {
     static rbtree_node_t* get_head(rbtree_node_t* node) { return static_cast<rbtree_links_t*>(node)->head; }
     static rbtree_node_t* get_front(rbtree_node_t* head) { return head->parent; }
 #else   // UXS_ITERATOR_DEBUG_LEVEL != 0
-    static void set_head(rbtree_node_t* node, rbtree_node_t* head) {}
-    static void set_head(rbtree_node_t* first, rbtree_node_t* last, rbtree_node_t* head) {}
+    static void set_head(rbtree_node_t* /*node*/, rbtree_node_t* /*head*/) {}
+    static void set_head(rbtree_node_t* /*first*/, rbtree_node_t* /*last*/, rbtree_node_t* /*head*/) {}
 #endif  // UXS_ITERATOR_DEBUG_LEVEL != 0
 };
 
@@ -635,7 +635,7 @@ class rbtree_base : protected rbtree_compare<NodeTraits, Alloc, Comp> {
     }
 
     template<typename Other>
-    static void tidy_other(Other&& other, std::true_type /* copy other */) {}
+    static void tidy_other(Other&& /*other*/, std::true_type /* copy other */) {}
     template<typename Other>
     static void tidy_other(Other&& other, std::false_type /* move other */) {
         other.tidy();
