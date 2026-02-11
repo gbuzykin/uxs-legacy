@@ -1,9 +1,9 @@
 #pragma once
 
+#include "uxs-legacy/config.h"
+
 #include <uxs/alignment.h>
 #include <uxs/dllist.h>
-
-#include "uxs-legacy/config.h"
 
 #include <cassert>
 #include <memory>
