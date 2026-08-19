@@ -8,6 +8,32 @@
 
 namespace uxs {
 
+namespace detail {
+template<typename Val>
+class const_value_iterator
+    : public iterator_facade<const_value_iterator<Val>, Val, std::input_iterator_tag, const Val&, const Val*> {
+ public:
+    explicit const_value_iterator(const Val& v) noexcept : v_(std::addressof(v)) {}
+
+    void increment() noexcept {}
+    void advance(std::ptrdiff_t /*j*/) noexcept {}
+    const Val& dereference() const noexcept { return *v_; }
+    bool is_equal_to(const const_value_iterator& it) const noexcept {
+        (void)it;
+        assert(v_ == it.v_);
+        return true;
+    }
+
+ private:
+    const Val* v_;
+};
+
+template<typename Val>
+const_value_iterator<Val> const_value(const Val& v) noexcept {
+    return const_value_iterator<Val>(v);
+}
+}  // namespace detail
+
 //-----------------------------------------------------------------------------
 // Vector implementation
 
@@ -41,7 +67,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
     }
 
     vector(size_type sz, const value_type& val, const allocator_type& alloc = allocator_type()) : alloc_type(alloc) {
-        init(sz, const_value(val));
+        init(sz, detail::const_value(val));
     }
 
     vector(std::initializer_list<value_type> l, const allocator_type& alloc = allocator_type()) : alloc_type(alloc) {
@@ -155,7 +181,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
         return *rbegin();
     }
 
-    void assign(size_type sz, const value_type& val) { assign_impl(sz, const_value(val)); }
+    void assign(size_type sz, const value_type& val) { assign_impl(sz, detail::const_value(val)); }
 
     void assign(std::initializer_list<value_type> l) { assign_impl(l.size(), l.begin()); }
 
@@ -204,7 +230,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
         } else {
             size_type count = sz - size();
             if (sz <= capacity()) {
-                v_.end = helpers::construct_copy(*this, v_.end, count, const_value(val));
+                v_.end = helpers::construct_copy(*this, v_.end, count, detail::const_value(val));
             } else {
                 auto v = alloc_new(grow_capacity(count));
                 resize_relocate_fill(v, count, val, std::is_nothrow_move_constructible<Ty>());
@@ -513,7 +539,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
     void resize_relocate_fill(vector_ptrs_t& v, size_type count, const value_type& val,
                               std::true_type /* nothrow move */) {
         try {
-            v.end = helpers::construct_copy(*this, v.begin + size(), count, const_value(val));
+            v.end = helpers::construct_copy(*this, v.begin + size(), count, detail::const_value(val));
             helpers::construct_relocate(*this, v.begin, v_.begin, v_.end);
         } catch (...) {
             alloc_traits::deallocate(*this, v.begin, static_cast<size_type>(v.boundary - v.begin));
@@ -525,7 +551,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
                               std::false_type /* nothrow move */) {
         try {
             v.end = helpers::construct_relocate_copy(*this, v.end, v_.begin, v_.end);
-            v.end = helpers::construct_copy(*this, v.end, count, const_value(val));
+            v.end = helpers::construct_copy(*this, v.end, count, detail::const_value(val));
         } catch (...) {
             tidy(v);
             throw;
@@ -605,7 +631,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
             value_type* val_copy = reinterpret_cast<value_type*>(&buf);
             alloc_traits::construct(*this, val_copy, val);
             try {
-                insert_no_relocate(p, count, const_value(*val_copy), std::is_copy_assignable<Ty>());
+                insert_no_relocate(p, count, detail::const_value(*val_copy), std::is_copy_assignable<Ty>());
                 alloc_traits::destroy(*this, val_copy);
                 return p;
             } catch (...) {
@@ -614,7 +640,7 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
             }
         }
         auto v = alloc_new(grow_capacity(count));
-        p = insert_relocate(v, p, count, const_value(val), std::is_nothrow_move_constructible<Ty>());
+        p = insert_relocate(v, p, count, detail::const_value(val), std::is_nothrow_move_constructible<Ty>());
         reset(v);
         return p;
     }

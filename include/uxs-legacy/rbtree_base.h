@@ -576,7 +576,7 @@ class rbtree_base : protected rbtree_compare<NodeTraits, Alloc, Comp> {
             }
         }
         rbtree_node_t* operator*() const { return reuse; }
-        operator bool() const { return reuse != std::addressof(tree->head_); }
+        explicit operator bool() const { return reuse != std::addressof(tree->head_); }
         rbtree_node_t* advance() {
             auto* node = reuse;
             reuse = get_next(reuse);
