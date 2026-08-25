@@ -2,8 +2,7 @@
 
 #include "rbtree_node_handle.h"
 
-#include <uxs/iterator.h>
-#include <uxs/memory.h>
+#include "uxs/iterator.h"
 
 namespace uxs {
 
@@ -185,7 +184,7 @@ class rbtree_base : protected rbtree_compare<NodeTraits, Alloc, Comp> {
         if (std::addressof(other) == this) { return *this; }
         this->change_compare(other.get_compare());
         assign_impl(other, std::bool_constant<(!alloc_traits::propagate_on_container_copy_assignment::value ||
-                                               is_alloc_always_equal<alloc_type>::value)>());
+                                               alloc_traits::is_always_equal::value)>());
         return *this;
     }
 
@@ -195,18 +194,18 @@ class rbtree_base : protected rbtree_compare<NodeTraits, Alloc, Comp> {
     }
 
     rbtree_base(rbtree_base&& other, const allocator_type& alloc) noexcept(noexcept(super(std::move(other))) &&
-                                                                           is_alloc_always_equal<alloc_type>())
+                                                                           alloc_traits::is_always_equal::value)
         : super(alloc, std::move(other.get_compare())) {
-        construct_impl(std::move(other), alloc, is_alloc_always_equal<alloc_type>());
+        construct_impl(std::move(other), alloc, typename alloc_traits::is_always_equal());
     }
 
     rbtree_base& operator=(rbtree_base&& other) noexcept(std::is_nothrow_move_assignable<super>::value &&
                                                          (alloc_traits::propagate_on_container_move_assignment::value ||
-                                                          is_alloc_always_equal<alloc_type>::value)) {
+                                                          alloc_traits::is_always_equal::value)) {
         if (std::addressof(other) == this) { return *this; }
         this->change_compare(std::move(other.get_compare()));
         assign_impl(std::move(other), std::bool_constant<(alloc_traits::propagate_on_container_move_assignment::value ||
-                                                          is_alloc_always_equal<alloc_type>::value)>());
+                                                          alloc_traits::is_always_equal::value)>());
         return *this;
     }
 

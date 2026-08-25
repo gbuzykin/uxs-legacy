@@ -17,6 +17,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
     using node_traits = NodeTraits;
     using super = rbtree_base<node_traits, Alloc, Comp>;
     using alloc_type = typename super::alloc_type;
+    using alloc_traits = std::allocator_traits<alloc_type>;
 
  public:
     using allocator_type = typename super::allocator_type;
@@ -115,7 +116,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
 
     insert_return_type insert(node_type&& nh) {
         if (nh.empty()) { return {this->end(), false, node_type(*this)}; }
-        if (!is_alloc_always_equal<alloc_type>::value && !this->is_same_alloc(nh)) {
+        if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(nh)) {
             throw std::logic_error("allocators incompatible for insert");
         }
         auto* node = nh.node_;
@@ -133,7 +134,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
 
     iterator insert(const_iterator hint, node_type&& nh) {
         if (nh.empty()) { return this->end(); }
-        if (!is_alloc_always_equal<alloc_type>::value && !this->is_same_alloc(nh)) {
+        if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(nh)) {
             throw std::logic_error("allocators incompatible for insert");
         }
         auto* node = nh.node_;
@@ -231,7 +232,7 @@ template<typename NodeTraits, typename Alloc, typename Comp>
 template<typename Comp2>
 void rbtree_unique<NodeTraits, Alloc, Comp>::merge_impl(rbtree_base<NodeTraits, Alloc, Comp2>&& other) {
     if (!other.size_ || std::addressof(other) == static_cast<alloc_type*>(this)) { return; }
-    if (!is_alloc_always_equal<alloc_type>::value && !this->is_same_alloc(other)) {
+    if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(other)) {
         throw std::logic_error("allocators incompatible for merge");
     }
     auto* node = other.head_.parent;

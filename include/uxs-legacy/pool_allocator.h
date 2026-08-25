@@ -2,8 +2,8 @@
 
 #include "uxs-legacy/config.h"
 
-#include <uxs/dllist.h>
-#include <uxs/type_traits.h>
+#include "uxs/dllist.h"
+#include "uxs/type_traits.h"
 
 #include <cassert>
 #include <memory>

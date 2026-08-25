@@ -1,7 +1,7 @@
 #pragma once
 
-#include <uxs/iterator.h>
-#include <uxs/memory.h>
+#include "uxs/iterator.h"
+#include "uxs/memory.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -93,22 +93,22 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
     vector& operator=(const vector& other) {
         if (std::addressof(other) == this) { return *this; }
         assign_impl(other, std::bool_constant<(!alloc_traits::propagate_on_container_copy_assignment::value ||
-                                               is_alloc_always_equal<alloc_type>::value)>());
+                                               alloc_traits::is_always_equal::value)>());
         return *this;
     }
 
     vector(vector&& other) noexcept : alloc_type(std::move(other)), v_(other.v_) { other.v_.nullify(); }
 
-    vector(vector&& other, const allocator_type& alloc) noexcept(is_alloc_always_equal<alloc_type>::value)
+    vector(vector&& other, const allocator_type& alloc) noexcept(alloc_traits::is_always_equal::value)
         : alloc_type(alloc) {
-        construct_impl(std::move(other), alloc, is_alloc_always_equal<alloc_type>());
+        construct_impl(std::move(other), alloc, typename alloc_traits::is_always_equal());
     }
 
     vector& operator=(vector&& other) noexcept(alloc_traits::propagate_on_container_move_assignment::value ||
-                                               is_alloc_always_equal<alloc_type>::value) {
+                                               alloc_traits::is_always_equal::value) {
         if (std::addressof(other) == this) { return *this; }
         assign_impl(std::move(other), std::bool_constant<(alloc_traits::propagate_on_container_move_assignment::value ||
-                                                          is_alloc_always_equal<alloc_type>::value)>());
+                                                          alloc_traits::is_always_equal::value)>());
         return *this;
     }
 
