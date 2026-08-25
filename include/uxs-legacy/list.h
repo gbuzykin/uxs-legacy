@@ -1,8 +1,8 @@
 #pragma once
 
-#include <uxs/dllist.h>
-#include <uxs/iterator.h>
-#include <uxs/memory.h>
+#include "uxs/dllist.h"
+#include "uxs/iterator.h"
+#include "uxs/memory.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -145,7 +145,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
     list& operator=(const list& other) {
         if (std::addressof(other) == this) { return *this; }
         assign_impl(other, std::bool_constant<(!alloc_traits::propagate_on_container_copy_assignment::value ||
-                                               is_alloc_always_equal<alloc_type>::value)>());
+                                               alloc_traits::is_always_equal::value)>());
         return *this;
     }
 
@@ -154,16 +154,15 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
         steal_data(other);
     }
 
-    list(list&& other, const allocator_type& alloc) noexcept(is_alloc_always_equal<alloc_type>::value)
-        : alloc_type(alloc) {
-        construct_impl(std::move(other), alloc, is_alloc_always_equal<alloc_type>());
+    list(list&& other, const allocator_type& alloc) noexcept(alloc_traits::is_always_equal::value) : alloc_type(alloc) {
+        construct_impl(std::move(other), alloc, typename alloc_traits::is_always_equal());
     }
 
     list& operator=(list&& other) noexcept(alloc_traits::propagate_on_container_move_assignment::value ||
-                                           is_alloc_always_equal<alloc_type>::value) {
+                                           alloc_traits::is_always_equal::value) {
         if (std::addressof(other) == this) { return *this; }
         assign_impl(std::move(other), std::bool_constant<(alloc_traits::propagate_on_container_move_assignment::value ||
-                                                          is_alloc_always_equal<alloc_type>::value)>());
+                                                          alloc_traits::is_always_equal::value)>());
         return *this;
     }
 
@@ -666,7 +665,7 @@ template<typename Ty, typename Alloc>
 void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other) {
     assert(std::addressof(other) != this || pos == end());
     if (!other.size_ || std::addressof(other) == this) { return; }
-    if (!is_alloc_always_equal<alloc_type>::value && !is_same_alloc(other)) {
+    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
         throw std::logic_error("allocators incompatible for splice");
     }
     node_traits::set_head(other.head_.next, std::addressof(other.head_), std::addressof(head_));
@@ -679,7 +678,7 @@ template<typename Ty, typename Alloc>
 void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other, const_iterator it) {
     auto* p = other.to_ptr(it);
     if (std::addressof(other) != this) {
-        if (!is_alloc_always_equal<alloc_type>::value && !is_same_alloc(other)) {
+        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
             throw std::logic_error("allocators incompatible for splice");
         }
         node_traits::set_head(p, std::addressof(head_));
@@ -697,7 +696,7 @@ void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other, const_iterat
     auto* p_last = other.to_ptr(last);
     if (p_first == p_last) { return; }
     if (std::addressof(other) != this) {
-        if (!is_alloc_always_equal<alloc_type>::value && !is_same_alloc(other)) {
+        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
             throw std::logic_error("allocators incompatible for splice");
         }
         size_type count = 0;
@@ -724,7 +723,7 @@ template<typename Ty, typename Alloc>
 template<typename Comp>
 void list<Ty, Alloc>::merge_impl(list&& other, Comp comp) {
     if (!other.size_ || std::addressof(other) == this) { return; }
-    if (!is_alloc_always_equal<alloc_type>::value && !is_same_alloc(other)) {
+    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
         throw std::logic_error("allocators incompatible for merge");
     }
     auto* head_src = std::addressof(other.head_);

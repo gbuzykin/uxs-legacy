@@ -2,6 +2,8 @@
 
 #include "rbtree_unique.h"
 
+#include "uxs/memory.h"
+
 #include <algorithm>
 #include <functional>
 

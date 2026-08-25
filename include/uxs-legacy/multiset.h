@@ -2,6 +2,8 @@
 
 #include "rbtree_multi.h"
 
+#include "uxs/memory.h"
+
 #include <algorithm>
 #include <functional>
 
