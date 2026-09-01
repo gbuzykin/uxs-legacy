@@ -4,6 +4,13 @@
 
 #include "uxs/iterator.h"
 
+#if __cplusplus < 201703L && !defined(__cpp_lib_is_swappable)
+namespace std {
+template<typename Ty>
+using is_nothrow_swappable = bool_constant<noexcept(swap(declval<Ty&>(), declval<Ty&>()))>;
+}
+#endif  // is swappable
+
 namespace uxs {
 
 namespace detail {
@@ -161,8 +168,8 @@ class rbtree_base : protected rbtree_compare<NodeTraits, Alloc, Comp> {
     using const_pointer = typename value_alloc_traits::const_pointer;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = list_iterator<rbtree_base, node_traits, std::is_same<key_type, value_type>::value>;
-    using const_iterator = list_iterator<rbtree_base, node_traits, true>;
+    using iterator = est::list_iterator<rbtree_base, node_traits, std::is_same<key_type, value_type>::value>;
+    using const_iterator = est::list_iterator<rbtree_base, node_traits, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using node_type = rbtree_node_handle<node_traits, Alloc>;
@@ -755,7 +762,7 @@ void rbtree_base<NodeTraits, Alloc, Comp>::copy_node_reuse(rbtree_node_t* node, 
 
 #if __cplusplus >= 201703L
 template<typename InputIt>
-using iter_key_t = est::remove_const_t<typename std::iterator_traits<InputIt>::value_type::first_type>;
+using iter_key_t = std::remove_const_t<typename std::iterator_traits<InputIt>::value_type::first_type>;
 template<typename InputIt>
 using iter_val_t = typename std::iterator_traits<InputIt>::value_type::second_type;
 template<typename InputIt>

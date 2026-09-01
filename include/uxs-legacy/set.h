@@ -69,7 +69,7 @@ class set : public detail::rbtree_unique<detail::set_node_traits<Key>, Alloc, Co
         return *this;
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     set(InputIt first, InputIt last, const allocator_type& alloc) : super(alloc) {
         try {
             this->insert_impl(first, last);
@@ -79,7 +79,7 @@ class set : public detail::rbtree_unique<detail::set_node_traits<Key>, Alloc, Co
         }
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     set(InputIt first, InputIt last, const key_compare& comp = key_compare(),
         const allocator_type& alloc = allocator_type())
         : super(comp, alloc) {
@@ -123,16 +123,18 @@ class set : public detail::rbtree_unique<detail::set_node_traits<Key>, Alloc, Co
 #if __cplusplus >= 201703L
 template<typename InputIt, typename Comp = std::less<typename std::iterator_traits<InputIt>::value_type>,
          typename Alloc = std::allocator<typename std::iterator_traits<InputIt>::value_type>,
-         typename = std::enable_if_t<!is_allocator<Comp>::value>, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+         typename = std::enable_if_t<!est::is_allocator<Comp>::value>,
+         typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 set(InputIt, InputIt, Comp = Comp(), Alloc = Alloc())
     -> set<typename std::iterator_traits<InputIt>::value_type, Comp, Alloc>;
 template<typename Key, typename Comp = std::less<Key>, typename Alloc = std::allocator<Key>,
-         typename = std::enable_if_t<!is_allocator<Comp>::value>, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+         typename = std::enable_if_t<!est::is_allocator<Comp>::value>,
+         typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 set(std::initializer_list<Key>, Comp = Comp(), Alloc = Alloc()) -> set<Key, Comp, Alloc>;
-template<typename InputIt, typename Alloc, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+template<typename InputIt, typename Alloc, typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 set(InputIt, InputIt, Alloc) -> set<typename std::iterator_traits<InputIt>::value_type,
                                     std::less<typename std::iterator_traits<InputIt>::value_type>, Alloc>;
-template<typename Key, typename Alloc, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+template<typename Key, typename Alloc, typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 set(std::initializer_list<Key>, Alloc) -> set<Key, std::less<Key>, Alloc>;
 #endif  // __cplusplus >= 201703L
 

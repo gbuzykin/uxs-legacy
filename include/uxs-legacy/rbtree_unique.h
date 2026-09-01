@@ -66,7 +66,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
 #endif  // __cplusplus < 201703L
 
     void assign(std::initializer_list<value_type> l) { assign_range(l.begin(), l.end()); }
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     void assign(InputIt first, InputIt last) {
         assign_range(first, last);
     }
@@ -163,7 +163,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
 
     void insert(std::initializer_list<value_type> l) { insert_impl(l.begin(), l.end()); }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     void insert(InputIt first, InputIt last) {
         insert_impl(first, last);
     }
@@ -175,7 +175,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
     void merge_impl(rbtree_base<NodeTraits, Alloc, Comp2>&& other);
     template<typename InputIt>
     void insert_impl(InputIt first, InputIt last) {
-        assert(super::check_iterator_range(first, last, is_random_access_iterator<InputIt>()));
+        assert(super::check_iterator_range(first, last, est::is_random_access_iterator<InputIt>()));
         for (; first != last; ++first) { emplace_hint(this->end(), *first); }
     }
 
@@ -210,7 +210,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
 template<typename NodeTraits, typename Alloc, typename Comp>
 template<typename InputIt>
 void rbtree_unique<NodeTraits, Alloc, Comp>::assign_range(InputIt first, InputIt last) {
-    assert(super::check_iterator_range(first, last, is_random_access_iterator<InputIt>()));
+    assert(super::check_iterator_range(first, last, est::is_random_access_iterator<InputIt>()));
     if (this->size_) {
         typename super::reuse_cache_t cache(this);
         this->reset();
