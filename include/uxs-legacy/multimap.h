@@ -73,7 +73,7 @@ class multimap : public detail::rbtree_multi<detail::map_node_traits<Key, Ty>, A
         return *this;
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     multimap(InputIt first, InputIt last, const allocator_type& alloc) : super(alloc) {
         try {
             this->insert_impl(first, last);
@@ -83,7 +83,7 @@ class multimap : public detail::rbtree_multi<detail::map_node_traits<Key, Ty>, A
         }
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     multimap(InputIt first, InputIt last, const key_compare& comp = key_compare(),
              const allocator_type& alloc = allocator_type())
         : super(comp, alloc) {
@@ -127,20 +127,22 @@ class multimap : public detail::rbtree_multi<detail::map_node_traits<Key, Ty>, A
 #if __cplusplus >= 201703L
 template<typename InputIt, typename Comp = std::less<detail::iter_key_t<InputIt>>,
          typename Alloc = std::allocator<detail::iter_to_alloc_t<InputIt>>,
-         typename = std::enable_if_t<!is_allocator<Comp>::value>, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+         typename = std::enable_if_t<!est::is_allocator<Comp>::value>,
+         typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 multimap(InputIt, InputIt, Comp = Comp(), Alloc = Alloc())
     -> multimap<detail::iter_key_t<InputIt>, detail::iter_val_t<InputIt>, Comp, Alloc>;
-template<typename Key, typename Ty, typename Comp = std::less<est::remove_const_t<Key>>,
+template<typename Key, typename Ty, typename Comp = std::less<std::remove_const_t<Key>>,
          typename Alloc = std::allocator<std::pair<const Key, Ty>>,
-         typename = std::enable_if_t<!is_allocator<Comp>::value>, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+         typename = std::enable_if_t<!est::is_allocator<Comp>::value>,
+         typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 multimap(std::initializer_list<std::pair<Key, Ty>>, Comp = Comp(), Alloc = Alloc())
-    -> multimap<est::remove_const_t<Key>, Ty, Comp, Alloc>;
-template<typename InputIt, typename Alloc, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+    -> multimap<std::remove_const_t<Key>, Ty, Comp, Alloc>;
+template<typename InputIt, typename Alloc, typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 multimap(InputIt, InputIt, Alloc)
     -> multimap<detail::iter_key_t<InputIt>, detail::iter_val_t<InputIt>, std::less<detail::iter_key_t<InputIt>>, Alloc>;
-template<typename Key, typename Ty, typename Alloc, typename = std::enable_if_t<is_allocator<Alloc>::value>>
+template<typename Key, typename Ty, typename Alloc, typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 multimap(std::initializer_list<std::pair<Key, Ty>>, Alloc)
-    -> multimap<est::remove_const_t<Key>, Ty, std::less<est::remove_const_t<Key>>, Alloc>;
+    -> multimap<std::remove_const_t<Key>, Ty, std::less<std::remove_const_t<Key>>, Alloc>;
 #endif  // __cplusplus >= 201703L
 
 template<typename Key, typename Ty, typename Comp, typename Alloc>

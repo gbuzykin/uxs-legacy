@@ -69,8 +69,8 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
     using const_pointer = typename value_alloc_traits::const_pointer;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = list_iterator<list, node_traits, false>;
-    using const_iterator = list_iterator<list, node_traits, true>;
+    using iterator = est::list_iterator<list, node_traits, false>;
+    using const_iterator = est::list_iterator<list, node_traits, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -111,7 +111,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
         return *this;
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     list(InputIt first, InputIt last, const allocator_type& alloc = allocator_type()) : alloc_type(alloc) {
         try {
             init();
@@ -217,7 +217,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
 
     void assign(std::initializer_list<value_type> l) { assign_range(l.begin(), l.end()); }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     void assign(InputIt first, InputIt last) {
         assign_range(first, last);
     }
@@ -252,7 +252,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
         return iterator(insert_impl(to_ptr(pos), l.begin(), l.end()));
     }
 
-    template<typename InputIt, typename = std::enable_if_t<is_input_iterator<InputIt>::value>>
+    template<typename InputIt, typename = std::enable_if_t<est::is_input_iterator<InputIt>::value>>
     iterator insert(const_iterator pos, InputIt first, InputIt last) {
         return iterator(insert_impl(to_ptr(pos), first, last));
     }
@@ -582,7 +582,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
 
     template<typename InputIt>
     void assign_range(InputIt first, InputIt last) {
-        assert(check_iterator_range(first, last, is_random_access_iterator<InputIt>()));
+        assert(check_iterator_range(first, last, est::is_random_access_iterator<InputIt>()));
         auto* p = head_.next;
         for (; p != std::addressof(head_) && first != last; ++first) {
             node_traits::get_value(p) = *first;
@@ -610,7 +610,7 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
 
     template<typename InputIt>
     list_links_t* insert_impl(list_links_t* pos, InputIt first, InputIt last) {
-        assert(check_iterator_range(first, last, is_random_access_iterator<InputIt>()));
+        assert(check_iterator_range(first, last, est::is_random_access_iterator<InputIt>()));
         auto* pre_first = pos->prev;
         for (; first != last; ++first) {
             auto* node = new_node(*first);
@@ -818,7 +818,7 @@ void list<Ty, Alloc>::sort(Comp comp) {
 
 #if __cplusplus >= 201703L
 template<typename InputIt, typename Alloc = std::allocator<typename std::iterator_traits<InputIt>::value_type>,
-         typename = std::enable_if_t<is_allocator<Alloc>::value>>
+         typename = std::enable_if_t<est::is_allocator<Alloc>::value>>
 list(InputIt, InputIt, Alloc = Alloc()) -> list<typename std::iterator_traits<InputIt>::value_type, Alloc>;
 #endif  // __cplusplus >= 201703L
 
