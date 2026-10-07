@@ -1,7 +1,8 @@
 #pragma once
 
-#include "uxs/rbtree.h"
 #include "uxs/utility.h"
+
+#include "uxs-legacy/rbtree.h"
 
 #include <memory>
 

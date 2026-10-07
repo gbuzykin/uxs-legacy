@@ -2,6 +2,7 @@
 
 #include "rbtree_base.h"
 
+#include <initializer_list>
 #include <stdexcept>
 
 namespace uxs {

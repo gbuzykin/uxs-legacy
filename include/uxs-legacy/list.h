@@ -5,6 +5,7 @@
 #include "uxs/memory.h"
 
 #include <algorithm>
+#include <initializer_list>
 #include <stdexcept>
 
 namespace uxs {

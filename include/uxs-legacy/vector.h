@@ -1,10 +1,11 @@
 #pragma once
 
+#include "uxs/except.h"
 #include "uxs/iterator.h"
 #include "uxs/memory.h"
 
 #include <algorithm>
-#include <stdexcept>
+#include <initializer_list>
 
 namespace uxs {
 
@@ -166,11 +167,11 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
 
     reference at(size_type i) {
         if (i < size()) { return v_.begin[i]; }
-        throw std::out_of_range("index out of range");
+        report_index_out_of_range_error();
     }
     const_reference at(size_type i) const {
         if (i < size()) { return v_.begin[i]; }
-        throw std::out_of_range("index out of range");
+        report_index_out_of_range_error();
     }
 
     reference front() {
@@ -276,7 +277,8 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
             } else {
                 helpers::emplace(*this, p, v_.end, std::forward<Args>(args)...);
             }
-            return iterator(p, v_.begin, ++v_.end);
+            ++v_.end;
+            return iterator(p, v_.begin, v_.end);
         }
         auto v = alloc_new(grow_capacity(1));
         p = emplace_relocate(v, p, std::is_nothrow_move_constructible<Ty>(), std::forward<Args>(args)...);
@@ -351,14 +353,14 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
         size_type delta_sz = std::max(extra, sz >> 1);
         const size_type max_avail = alloc_traits::max_size(*this) - sz;
         if (delta_sz > max_avail) {
-            if (extra > max_avail) { throw std::length_error("too much to reserve"); }
+            if (extra > max_avail) { report_too_much_to_allocate_error(); }
             delta_sz = std::max(extra, max_avail >> 1);
         }
         return std::max<size_type>(sz + delta_sz, start_capacity);
     }
 
     vector_ptrs_t alloc_new_checked(size_type sz) {
-        if (sz > alloc_traits::max_size(*this)) { throw std::length_error("too much to reserve"); }
+        if (sz > alloc_traits::max_size(*this)) { report_too_much_to_allocate_error(); }
         return alloc_new(sz);
     }
 
