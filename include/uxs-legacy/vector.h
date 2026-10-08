@@ -11,7 +11,7 @@ namespace uxs {
 namespace detail {
 template<typename Val>
 class const_value_iterator
-    : public est::iterator_facade<const_value_iterator<Val>, Val, std::input_iterator_tag, const Val&, const Val*> {
+    : public est::input_iterator_facade<const_value_iterator<Val>, Val, std::input_iterator_tag, const Val&, const Val*> {
  public:
     explicit const_value_iterator(const Val& v) noexcept : v_(std::addressof(v)) {}
 
@@ -46,6 +46,16 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
     using alloc_type = typename std::allocator_traits<Alloc>::template rebind_alloc<Ty>;
     using alloc_traits = std::allocator_traits<alloc_type>;
 
+    struct iterator_traits {
+        using value_type = Ty;
+        using difference_type = typename alloc_traits::difference_type;
+        using pointer = typename alloc_traits::pointer;
+        using const_pointer = typename alloc_traits::const_pointer;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using underlying_ptr_t = pointer;
+    };
+
  public:
     using value_type = Ty;
     using allocator_type = Alloc;
@@ -55,8 +65,8 @@ class vector : protected std::allocator_traits<Alloc>::template rebind_alloc<Ty>
     using const_pointer = typename alloc_traits::const_pointer;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = est::array_iterator<vector, pointer, false>;
-    using const_iterator = est::array_iterator<vector, pointer, true>;
+    using iterator = est::array_iterator<iterator_traits, false>;
+    using const_iterator = est::array_iterator<iterator_traits, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 

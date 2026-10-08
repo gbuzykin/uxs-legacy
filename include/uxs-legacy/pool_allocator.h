@@ -14,6 +14,11 @@ namespace detail {
 template<typename Pool, std::uint16_t Size, std::uint16_t Alignment>
 struct pool_specializer;
 
+struct dllist_node_t {
+    dllist_node_t* next;
+    dllist_node_t* prev;
+};
+
 struct pool_part_hdr_t : dllist_node_t {
     std::uint32_t use_count;
 };
@@ -25,8 +30,9 @@ class pool {
     using alloc_type = typename std::allocator_traits<Alloc>::template rebind_alloc<pool_desc_t>;
 
     template<typename Ty>
-    using pool_specializer_t = pool_specializer<pool, est::size_of<pool_part_hdr_t, Ty>::value,  //
-                                                est::alignment_of<pool_part_hdr_t, Ty>::value>;
+    using pool_specializer_t =
+        pool_specializer<pool, est::maximum<est::size_of<pool_part_hdr_t>, est::size_of<Ty>>::value,
+                         est::maximum<std::alignment_of<pool_part_hdr_t>, std::alignment_of<Ty>>::value>;
 
     struct pool_desc_t : alloc_type {
         dllist_node_t free;

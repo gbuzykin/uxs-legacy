@@ -60,6 +60,15 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
     using value_alloc_type = typename std::allocator_traits<Alloc>::template rebind_alloc<Ty>;
     using value_alloc_traits = std::allocator_traits<value_alloc_type>;
 
+    struct iterator_traits : node_traits {
+        using value_type = Ty;
+        using difference_type = typename value_alloc_traits::difference_type;
+        using pointer = typename value_alloc_traits::pointer;
+        using const_pointer = typename value_alloc_traits::const_pointer;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+    };
+
  public:
     using value_type = Ty;
     using allocator_type = Alloc;
@@ -69,8 +78,8 @@ class list : protected std::allocator_traits<Alloc>::template rebind_alloc<  //
     using const_pointer = typename value_alloc_traits::const_pointer;
     using reference = value_type&;
     using const_reference = const value_type&;
-    using iterator = est::list_iterator<list, node_traits, false>;
-    using const_iterator = est::list_iterator<list, node_traits, true>;
+    using iterator = est::list_iterator<iterator_traits, false>;
+    using const_iterator = est::list_iterator<iterator_traits, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
