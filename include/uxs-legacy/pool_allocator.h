@@ -14,11 +14,6 @@ namespace detail {
 template<typename Pool, std::uint16_t Size, std::uint16_t Alignment>
 struct pool_specializer;
 
-struct dllist_node_t {
-    dllist_node_t* next;
-    dllist_node_t* prev;
-};
-
 struct pool_part_hdr_t : dllist_node_t {
     std::uint32_t use_count;
 };
