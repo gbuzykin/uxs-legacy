@@ -1,12 +1,12 @@
 #pragma once
 
 #include "uxs/dllist.h"
+#include "uxs/except.h"
 #include "uxs/iterator.h"
 #include "uxs/memory.h"
 
 #include <algorithm>
 #include <initializer_list>
-#include <stdexcept>
 
 namespace uxs {
 
@@ -675,9 +675,7 @@ template<typename Ty, typename Alloc>
 void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other) {
     assert(std::addressof(other) != this || pos == end());
     if (!other.size_ || std::addressof(other) == this) { return; }
-    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
-        throw std::logic_error("allocators incompatible for splice");
-    }
+    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) { report_incompatible_allocators_error(); }
     node_traits::set_head(other.head_.next, std::addressof(other.head_), std::addressof(head_));
     dllist_insert_before(to_ptr(pos), other.head_.next, other.head_.prev);
     size_ += other.size_;
@@ -688,9 +686,7 @@ template<typename Ty, typename Alloc>
 void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other, const_iterator it) {
     auto* p = other.to_ptr(it);
     if (std::addressof(other) != this) {
-        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
-            throw std::logic_error("allocators incompatible for splice");
-        }
+        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) { report_incompatible_allocators_error(); }
         node_traits::set_head(p, std::addressof(head_));
         ++size_, --other.size_;
     } else if (it == pos) {
@@ -706,9 +702,7 @@ void list<Ty, Alloc>::splice_impl(const_iterator pos, list&& other, const_iterat
     auto* p_last = other.to_ptr(last);
     if (p_first == p_last) { return; }
     if (std::addressof(other) != this) {
-        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
-            throw std::logic_error("allocators incompatible for splice");
-        }
+        if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) { report_incompatible_allocators_error(); }
         size_type count = 0;
         auto* p = p_first;
         do {
@@ -733,9 +727,7 @@ template<typename Ty, typename Alloc>
 template<typename Comp>
 void list<Ty, Alloc>::merge_impl(list&& other, Comp comp) {
     if (!other.size_ || std::addressof(other) == this) { return; }
-    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) {
-        throw std::logic_error("allocators incompatible for merge");
-    }
+    if (!alloc_traits::is_always_equal::value && !is_same_alloc(other)) { report_incompatible_allocators_error(); }
     auto* head_src = std::addressof(other.head_);
     node_traits::set_head(head_src->next, head_src, std::addressof(head_));
     size_ += other.size_;
