@@ -2,8 +2,9 @@
 
 #include "rbtree_base.h"
 
+#include "uxs/except.h"
+
 #include <initializer_list>
-#include <stdexcept>
 
 namespace uxs {
 
@@ -118,7 +119,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
     insert_return_type insert(node_type&& nh) {
         if (nh.empty()) { return {this->end(), false, node_type(*this)}; }
         if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(nh)) {
-            throw std::logic_error("allocators incompatible for insert");
+            report_incompatible_allocators_error();
         }
         auto* node = nh.node_;
         auto result = rbtree_find_insert_unique_pos<node_traits>(
@@ -136,7 +137,7 @@ class rbtree_unique : public rbtree_base<NodeTraits, Alloc, Comp> {
     iterator insert(const_iterator hint, node_type&& nh) {
         if (nh.empty()) { return this->end(); }
         if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(nh)) {
-            throw std::logic_error("allocators incompatible for insert");
+            report_incompatible_allocators_error();
         }
         auto* node = nh.node_;
         auto result = rbtree_find_insert_unique_pos<node_traits>(std::addressof(this->head_), this->to_ptr(hint),
@@ -234,7 +235,7 @@ template<typename Comp2>
 void rbtree_unique<NodeTraits, Alloc, Comp>::merge_impl(rbtree_base<NodeTraits, Alloc, Comp2>&& other) {
     if (!other.size_ || std::addressof(other) == static_cast<alloc_type*>(this)) { return; }
     if (!alloc_traits::is_always_equal::value && !this->is_same_alloc(other)) {
-        throw std::logic_error("allocators incompatible for merge");
+        report_incompatible_allocators_error();
     }
     auto* node = other.head_.parent;
     do {
